@@ -1,4 +1,4 @@
-myNiceLock
+myLock Easy encryption
 ==========
 
-Super friendly secure communication for everyone!
+**WARNING: THIS IS A PROOF OF CONCEPT AND SHOULD NOT BE USED FOR REAL SECRETS.**
