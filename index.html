@@ -179,7 +179,7 @@
                         </div>
                         <div id="encryption_percent">100%</div>
                     </div>
-                    <a id="encryption_data">Download</a>
+                    <a id="encryption_data" target="_blank">Download</a>
                     <div id="encryption_status"></div>
                 </div>
             </div>
@@ -201,7 +201,7 @@
                         </div>
                         <div id="decryption_percent">100%</div>
                     </div>
-                    <a id="decryption_data">Download</a>
+                    <a id="decryption_data" target="_blank">Download</a>
                     <div id="decryption_status"></div>
                 </div>
             </div>
@@ -378,8 +378,8 @@
                         return;
                     }
 
-                    //generate a file encryption key and set chunks to 500kB
-                    var chunkSize = 500000;
+                    //generate a file encryption key and set chunks to 200kB
+                    var chunkSize = 200000;
                     var fileKey = nacl.randomBytes(32);
 
                     //encrypt a userInfo for each recipient in this format:
