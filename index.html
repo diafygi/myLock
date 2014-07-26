@@ -378,9 +378,9 @@
                         return;
                     }
 
-                    //generate a file encryption key
+                    //generate a file encryption key and set chunks to 500kB
+                    var chunkSize = 500000;
                     var fileKey = nacl.randomBytes(32);
-                    var fileNonce = nacl.randomBytes(24);
 
                     //encrypt a userInfo for each recipient in this format:
                     //{
@@ -391,9 +391,9 @@
                     //        "fileInfo": {
                     //            "fileInfoNonce": <Base58>,
                     //            "fileInfoEncrypted": {
+                    //                "chunkSize": <Integer>,
                     //                "fileName": <String>,
                     //                "fileType": <MIME-type>,
-                    //                "fileNonce": <Base58>,
                     //                "fileKey": <Base58>,
                     //            } (encrypted with recipient.publicKey, fileInfoNonce, and sender.secretKey),
                     //        },
@@ -413,9 +413,9 @@
                         var fileInfoNonce = nacl.randomBytes(24);
                         var fileInfoEncrypted = nacl.box(
                             nacl.util.decodeUTF8(JSON.stringify({
+                                "chunkSize": chunkSize,
                                 "fileName": filename,
                                 "fileType": file.type,
-                                "fileNonce": Base58.encode(fileNonce),
                                 "fileKey": Base58.encode(fileKey),
                             })),
                             fileInfoNonce,
@@ -459,29 +459,56 @@
                     var reader = new FileReader();
                     reader.onload = function(){
 
+                        //calculate how many chunks of 10kB
+                        var rawArray = new Uint8Array(reader.result);
+                        var numChunks = Math.ceil(rawArray.byteLength / chunkSize);
+
+                        //each chunk has a 24 byte nonce and an additional 16 bytes when encrypted
+                        var encryptedArray = new Uint8Array(rawArray.byteLength + numChunks * (16 + 24));
+
                         //use web worker to encrypt
                         var worker_blob = new Blob([
                             document.getElementById('encrypt_worker').textContent
                         ], {"type": "text/javascript"});
                         var worker = new Worker(window.URL.createObjectURL(worker_blob));
 
-                        //listen for encryption completion
-                        worker.onmessage = function(message){
+                        function encryptChunk(i){
+                            //calculate raw chunk
+                            var chunk = rawArray.subarray(i * chunkSize, (i + 1) * chunkSize);
+                            var nonce = nacl.randomBytes(24);
 
-                            //construct the locked file
-                            var blob = new Blob([header, message.data], {
-                                "type": "application/mylock",
+                            //listen for chunk encryption completion
+                            worker.onmessage = function(message){
+
+                                //populate that chunk of the encrypted array
+                                var offset = i * (chunkSize + 16 + 24);
+                                encryptedArray.set(nonce, offset);
+                                encryptedArray.set(message.data, offset + 24);
+
+                                //see if you need to process another chunk
+                                if(i < numChunks - 1){
+                                    onprogress(Math.round(i / numChunks * 100));
+                                    encryptChunk(i + 1);
+                                }
+                                //last chunk
+                                else{
+                                    //construct the locked file
+                                    var blob = new Blob([header, encryptedArray], {
+                                        "type": "application/mylock",
+                                    });
+
+                                    //fire the success event
+                                    onprogress(100);
+                                    ondone(blob);
+                                }
+                            };
+                            worker.postMessage({
+                                "raw": chunk,
+                                "nonce": nonce,
+                                "key": fileKey,
                             });
-
-                            //fire the success event
-                            onprogress(100);
-                            ondone(blob);
-                        };
-                        worker.postMessage({
-                            "raw": new Uint8Array(reader.result),
-                            "nonce": fileNonce,
-                            "key": fileKey,
-                        });
+                        }
+                        encryptChunk(0);
                     };
                     reader.readAsArrayBuffer(file);
                 };
@@ -506,7 +533,16 @@
                                     last = i + 1;
                                     break;
                                 }
-                                userInfos.push(nacl.util.encodeUTF8(data.subarray(last, i)));
+                                //try to decode the header
+                                try{
+                                    userInfos.push(nacl.util.encodeUTF8(data.subarray(last, i)));
+                                }
+                                //bail out if not decoded
+                                catch(e){
+                                    console.log(e);
+                                    ondone(null, null, null, "Couldn't parse header");
+                                    return;
+                                }
                                 last = i + 1;
                             }
                         }
@@ -516,10 +552,10 @@
                         //    "sender": <username>,
                         //    "filename": <filename>,
                         //    "fileInfo": {
+                        //        "chunkSize": <Integer>,
                         //        "fileName": <String>,
                         //        "fileType": <MIME-type>,
-                        //        "fileNonce": <Uint8Array>,
-                        //        "fileKey": <Uint8Array>,
+                        //        "fileKey": <Base58>,
                         //    },
                         //}
                         var userInfo;
@@ -573,10 +609,7 @@
 
                                 //set filename in the userInfo object
                                 tmpInfo['fileInfo'] = JSON.parse(nacl.util.encodeUTF8(tmpFileInfo));
-                                tmpInfo['fileInfo']['fileName'] = tmpInfo['fileInfo']['fileName'] || "file";
-                                tmpInfo['fileInfo']['fileType'] = tmpInfo['fileInfo']['fileType'] || "application/octet-stream";
                                 tmpInfo['fileInfo']['fileKey'] = Base58.decode(tmpInfo['fileInfo']['fileKey']);
-                                tmpInfo['fileInfo']['fileNonce'] = Base58.decode(tmpInfo['fileInfo']['fileNonce']);
                             }
                             catch(e){
                                 console.log(e);
@@ -588,11 +621,20 @@
                             userInfo = tmpInfo;
                             break;
                         }
+
                         //couldn't read any headers, so bail out
                         if(userInfo === undefined){
                             ondone(null, null, null, "Couldn't read any headers");
                             return;
                         }
+
+                        //calculate how many chunks
+                        var encryptedArray = data.subarray(last, data.byteLength);
+                        var chunkSize = userInfo['fileInfo']['chunkSize'];
+                        var numChunks = Math.ceil(encryptedArray.byteLength / (chunkSize + 16 + 24));
+
+                        //define the decrypted array (remove 16 bytes per chunk)
+                        var decryptedArray = new Uint8Array(encryptedArray.byteLength - (16 + 24) * numChunks);
 
                         //use web worker to decrypt
                         var worker_blob = new Blob([
@@ -600,29 +642,54 @@
                         ], {"type": "text/javascript"});
                         var worker = new Worker(window.URL.createObjectURL(worker_blob));
 
-                        //listen for decryption completion
-                        worker.onmessage = function(message){
+                        function decryptChunk(i){
+                            //calculate raw nonce subsection
+                            var nonce = encryptedArray.subarray(
+                                i * (chunkSize + 16 + 24),
+                                i * (chunkSize + 16 + 24) + 24);
 
-                            //decrypt the file with the fileNonce and fileKey
-                            if(message.data === false){
-                                ondone(null, null, null, "Couldn't decrypt file");
-                                return;
-                            }
+                            //calculate raw chunk subsection
+                            var chunk = encryptedArray.subarray(
+                                i * (chunkSize + 16 + 24) + 24,
+                                (i + 1) * (chunkSize + 16 + 24));
 
-                            //create blob and return success
-                            onprogress(100);
-                            ondone(
-                                userInfo['sender'],
-                                userInfo['fileInfo']['fileName'],
-                                new Blob([message.data], {
-                                    "type": userInfo['fileInfo']['fileType'],
-                                }));
-                        };
-                        worker.postMessage({
-                            "encrypted": data.subarray(last, data.byteLength),
-                            "nonce": userInfo['fileInfo']['fileNonce'],
-                            "key": userInfo['fileInfo']['fileKey'],
-                        });
+                            //listen for decryption completion
+                            worker.onmessage = function(message){
+
+                                //decrypt the file with the fileNonce and fileKey
+                                if(message.data === false){
+                                    ondone(null, null, null, "Couldn't decrypt file");
+                                    return;
+                                }
+
+                                //populate that chunk of the decrypted array
+                                var offset = i * chunkSize;
+                                decryptedArray.set(message.data, offset);
+
+                                //see if you need to process another chunk
+                                if(i < numChunks - 1){
+                                    onprogress(Math.round(i / numChunks * 100));
+                                    decryptChunk(i + 1);
+                                }
+                                //last chunk
+                                else{
+                                    //create blob and return success
+                                    onprogress(100);
+                                    ondone(
+                                        userInfo['sender'],
+                                        userInfo['fileInfo']['fileName'],
+                                        new Blob([decryptedArray], {
+                                            "type": userInfo['fileInfo']['fileType'],
+                                        }));
+                                }
+                            };
+                            worker.postMessage({
+                                "encrypted": chunk,
+                                "nonce": nonce,
+                                "key": userInfo['fileInfo']['fileKey'],
+                            });
+                        }
+                        decryptChunk(0);
                     }
 
                     //convert file Blob to Uint8Array
