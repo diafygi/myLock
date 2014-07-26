@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>myLock Easy Encryption</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <style>
+            html, body, div, span, h1, h2, p, input, button{color:#000000;display:inline-block;margin:0;padding:0;font-family:"monospace";font-size:12px;}
+            body{width:100%;text-align:center;}
+            #wrapper{width:90%;text-align:center;}
+            #wrapper > div{max-width:620px;text-align:left;}
+            .error{color:#dd0000;}
+
+            /* Login screen */
+            #login{padding:10px;}
+            h1{width:100%;text-align:center;font-size:24px;}
+            #intro{font-size:14px;text-align:justify;}
+            h2{margin:10px 0px;font-size:16px;}
+            #login p{margin:10px 0px;}
+            #login label{display:inline-block;margin-top:5px;width:100px;}
+            #login div.input_wrapper{max-width:490px;width:100%;}
+            #login input{width:100%;border:1px solid #aaaaaa;padding:2px;}
+            #login input[type=submit]{width:160px;margin:10px 0px 0px 106px;font-size:16px;border:2px solid #aaaaaa;background-color:#ffffff;border-radius:5px;}
+            #login input[type=submit]:hover{background-color:#eeeeee}
+            #login span{display:inline-block;}
+
+            /* Logged-in header */
+            #header{width:100%;padding-top:10px;}
+            #header label{width:100px;}
+            #username_wrapper{max-width:450px;width:100%;}
+            #username{width:100%;border:1px solid #aaaaaa;padding:2px;}
+            #logout{display:inline-block;float:right;}
+
+            /* Main screen */
+            #main{width:100%;text-align:center !important;}
+            #main button{width:80%;max-width:300px;border-radius:10px;margin-top:30px;padding:10px;border:2px solid #aaaaaa;background-color:#ffffff;}
+            #main button:hover{background-color:#eeeeee}
+            #tutorial_wrapper{max-width:100%;}
+            #tutorial_pointer{width:0;height:0;border-style:solid;border-width:0px 25px 20px 25px;border-color:transparent transparent #eeeeee transparent;}
+            #tutorial{max-width:400px;margin-top:-5px;border-radius:20px;padding:20px;background-color:#eeeeee;}
+            #tutorial p{text-align:justify;font-size:14px;}
+            #tutorial button{width:80px;margin:10px 0px 0px 0px;padding:5px;border:2px solid #aaaaaa;border-radius:5px;background-color:#eeeeee;}
+            #tutorial button:hover{background-color:#ffffff}
+
+            /* Send screen */
+            #send{width:100%}
+            #send a{display:inline-block;margin-bottom:20px;}
+            #recip_label{vertical-align:top;font-size:16px;}
+            #recip_list{vertical-align:top;max-width:560px;width:100%;margin-bottom:30px;}
+            input.recip_row{width:100%;}
+            #add_recip{font-size:10px;margin:3px;padding:0px 3px;border:1px solid #aaaaaa;border-radius:10px;background-color:#ffffff;}
+            #add_recip:hover{background-color:#eeeeee;}
+            #raw_wrapper{padding-bottom:30px;}
+            #raw_label{font-size:16px;margin-bottom:10px;}
+            #encryption_wrapper{width:100%;}
+            #encryption_label{font-size:16px;margin-bottom:10px;vertical-align:middle;}
+            #encryption_data{font-size:12px;text-decoration:none;color:#000000;padding:4px 20px;margin-bottom:10px;margin-top:-3px;border:2px solid #aaaaaa;border-radius:4px;background-color:#ffffff;vertical-align:top;}
+            #encryption_data:hover{color:#000000;background-color:#eeeeee;}
+            #encryption_percent_wrapper{width:100%;max-width:290px;margin-bottom:10px;vertical-align:middle;}
+            #encryption_percent{vertical-align:middle;}
+            #encryption_progress_wrapper{width:100%;max-width:240px;height:20px;border:2px solid #aaaaaa;vertical-align:middle;}
+            #encryption_progress{width:100%;height:20px;background-color:#aaaaaa;}
+
+            /* Receive screen */
+            #receive{width:100%}
+            #receive a{display:inline-block;margin-bottom:20px;}
+            #encrypted_wrapper{padding-bottom:30px;}
+            #encrypted_label{font-size:16px;margin-bottom:10px;}
+            #decryption_wrapper{width:100%;}
+            #decryption_label{font-size:16px;margin-bottom:10px;vertical-align:middle;}
+            #decryption_data{font-size:12px;text-decoration:none;color:#000000;padding:4px 20px;margin-bottom:10px;margin-top:-3px;border:2px solid #aaaaaa;border-radius:4px;background-color:#ffffff;vertical-align:top;}
+            #decryption_data:hover{color:#000000;background-color:#eeeeee;}
+            #decryption_percent_wrapper{width:100%;max-width:290px;margin-bottom:10px;vertical-align:middle;}
+            #decryption_percent{vertical-align:middle;}
+            #decryption_progress_wrapper{width:100%;max-width:240px;height:20px;border:2px solid #aaaaaa;vertical-align:middle;}
+            #decryption_progress{width:100%;height:20px;background-color:#aaaaaa;}
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+
+            <div id="login">
+                <h1>myLock Easy Encryption</h1>
+                <p id="intro">
+                    Welcome to myLock, the easy way to securely encrypt data
+                    for others! No one will be able to read anything you
+                    encrypt except the people you want. Additionally, this
+                    website is static, so no data is ever sent to any server.
+                    You can even save this page and open it locally on your
+                    computer! Finally, you can create as many new accounts as
+                    you want :)
+                </p>
+                <br/>
+                <h2>Create a new account:</h2>
+                <br/>
+                <form>
+                    <label for="new_secret">Secret phrase:</label>
+                    <div class="input_wrapper">
+                        <input id="new_secret" type="password" placeholder="A secret phrase only YOU know (seriously), at least 40 characters."/>
+                    </div>
+                    <br/>
+                    <input type="submit" id="register_button" value="Register"/>
+                    <span id="register_msg">(this will generate a new username)</span>
+                </form>
+                <br/>
+                <p>or</p>
+                <br/>
+                <h2>Login to an existing account:</h2>
+                <br/>
+                <form>
+                    <label for="existing_username">Username:</label>
+                    <div class="input_wrapper">
+                        <input id="existing_username" placeholder="e.g. myLock_7ZtuwNgGr1ngjdSiBSpHdQ7fh5pFNJh5xosRo4XJ1VhcrMdhQSHyZQH"/>
+                    </div>
+                    <br/>
+                    <label for="existing_secret">Secret phrase:</label>
+                    <div class="input_wrapper">
+                        <input id="existing_secret" type="password" placeholder="Your secret phrase"/>
+                    </div>
+                    <br/>
+                    <input type="submit" id="login_button" value="Login"/>
+                    <span id="login_msg"></span>
+                </form>
+            </div>
+
+            <div id="header" style="display:none;">
+                <a id="logout" href="#">logout</a>
+                <label for="username">Your username:</label>
+                <div id="username_wrapper">
+                    <input id="username" value="" readonly/>
+                </div>
+            </div>
+            <br/>
+
+            <div id="main" style="display:none;">
+                <div id="tutorial_wrapper">
+                    <div id="tutorial_pointer"></div>
+                    <br/>
+                    <div id="tutorial">
+                        <p>
+                            This is your new myLock username. <b>Copy it down!</b>
+                            This username can be shared and published freely.
+                            When you encrypt a file, all you need is the
+                            username of the person you want to send the file to.
+                        </p>
+                        <button id="close_tutorial">Got it.</button>
+                    </div>
+                </div>
+                <button id="choose_send">Encrypt a file</button>
+                <br/>
+                <button id="choose_receive">Decrypt a file</button>
+            </div>
+
+            <div id="send" style="display:none;">
+                <a id="send_back" href="#">&lt; Back</a>
+                <br/>
+                <label id="recip_label" for="recip">To:</label>
+                <div id="recip_list">
+                    <input id="recip" class="recip_row" placeholder="Recipient (e.g. myLock_7ZtuwNgGr1ngjdSiBSpHdQ7fh5pFNJh5xosRo4XJ1VhcrMdhQSHyZQH)"/>
+                    <button id="add_recip">+ Add more recipients</button>
+                </div>
+                <br/>
+                <div id="raw_wrapper">
+                    <div id="raw_label" for="raw_data">File you want to encrypt:</div>
+                    <br/>
+                    <input id="raw_data" type="file"></input>
+                </div>
+                <br/>
+                <div id="encryption_wrapper">
+                    <div id="encryption_label">Encrypted file:</div>
+                    <div id="encryption_percent_wrapper">
+                        <div id="encryption_progress_wrapper">
+                            <div id="encryption_progress"></div>
+                        </div>
+                        <div id="encryption_percent">100%</div>
+                    </div>
+                    <a id="encryption_data">Download</a>
+                    <div id="encryption_status"></div>
+                </div>
+            </div>
+
+            <div id="receive" style="display:none;">
+                <a id="receive_back" href="#">&lt; Back</a>
+                <br/>
+                <div id="encrypted_wrapper">
+                    <div id="encrypted_label" for="encrypted_data">File you want to decrypt:</div>
+                    <br/>
+                    <input id="encrypted_data" type="file"/>
+                </div>
+                <br/>
+                <div id="decryption_wrapper">
+                    <div id="decryption_label">Decrypted file:</div>
+                    <div id="decryption_percent_wrapper">
+                        <div id="decryption_progress_wrapper">
+                            <div id="decryption_progress"></div>
+                        </div>
+                        <div id="decryption_percent">100%</div>
+                    </div>
+                    <a id="decryption_data">Download</a>
+                    <div id="decryption_status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- External Libraries -->
+        <script>
+            //from https://github.com/dchest/tweetnacl-js/blob/51091a387335388a6a10ff89afbd16bfccc2c90c/nacl.min.js
+            !function(r){"use strict";function n(r,n){return r<<n|r>>>32-n}function e(r,n){var e=255&r[n+3];return e=e<<8|255&r[n+2],e=e<<8|255&r[n+1],e<<8|255&r[n+0]}function t(r,n){var e=r[n]<<24|r[n+1]<<16|r[n+2]<<8|r[n+3],t=r[n+4]<<24|r[n+5]<<16|r[n+6]<<8|r[n+7];return new sn(e,t)}function o(r,n,e){var t;for(t=0;4>t;t++)r[n+t]=255&e,e>>>=8}function i(r,n,e){r[n]=e.hi>>24&255,r[n+1]=e.hi>>16&255,r[n+2]=e.hi>>8&255,r[n+3]=255&e.hi,r[n+4]=e.lo>>24&255,r[n+5]=e.lo>>16&255,r[n+6]=e.lo>>8&255,r[n+7]=255&e.lo}function a(r,n,e,t,o){var i,a=0;for(i=0;o>i;i++)a|=r[n+i]^e[t+i];return(1&a-1>>>8)-1}function f(r,n,e,t){return a(r,n,e,t,16)}function u(r,n,e,t){return a(r,n,e,t,32)}function c(r,t,i,a,f){var u,c,w,y=new Uint32Array(16),l=new Uint32Array(16),s=new Uint32Array(16),h=new Uint32Array(4);for(u=0;4>u;u++)l[5*u]=e(a,4*u),l[1+u]=e(i,4*u),l[6+u]=e(t,4*u),l[11+u]=e(i,16+4*u);for(u=0;16>u;u++)s[u]=l[u];for(u=0;20>u;u++){for(c=0;4>c;c++){for(w=0;4>w;w++)h[w]=l[(5*c+4*w)%16];for(h[1]^=n(h[0]+h[3]|0,7),h[2]^=n(h[1]+h[0]|0,9),h[3]^=n(h[2]+h[1]|0,13),h[0]^=n(h[3]+h[2]|0,18),w=0;4>w;w++)y[4*c+(c+w)%4]=h[w]}for(w=0;16>w;w++)l[w]=y[w]}if(f){for(u=0;16>u;u++)l[u]=l[u]+s[u]|0;for(u=0;4>u;u++)l[5*u]=l[5*u]-e(a,4*u)|0,l[6+u]=l[6+u]-e(t,4*u)|0;for(u=0;4>u;u++)o(r,4*u,l[5*u]),o(r,16+4*u,l[6+u])}else for(u=0;16>u;u++)o(r,4*u,l[u]+s[u]|0)}function w(r,n,e,t){return c(r,n,e,t,!1),0}function y(r,n,e,t){return c(r,n,e,t,!0),0}function l(r,n,e,t,o,i,a){var f,u,c=new Uint8Array(16),y=new Uint8Array(64);if(!o)return 0;for(u=0;16>u;u++)c[u]=0;for(u=0;8>u;u++)c[u]=i[u];for(;o>=64;){for(w(y,c,a,Bn),u=0;64>u;u++)r[n+u]=(e?e[t+u]:0)^y[u];for(f=1,u=8;16>u;u++)f=f+(255&c[u])|0,c[u]=255&f,f>>>=8;o-=64,n+=64,e&&(t+=64)}if(o>0)for(w(y,c,a,Bn),u=0;o>u;u++)r[n+u]=(e?e[t+u]:0)^y[u];return 0}function s(r,n,e,t,o){return l(r,n,null,0,e,t,o)}function h(r,n,e,t,o){var i=new Uint8Array(32);return y(i,t,o,Bn),s(r,n,e,t.subarray(16),i)}function g(r,n,e,t,o,i,a){var f=new Uint8Array(32);return y(f,i,a,Bn),l(r,n,e,t,o,i.subarray(16),f)}function v(r,n){var e,t=0;for(e=0;17>e;e++)t=t+(r[e]+n[e]|0)|0,r[e]=255&t,t>>>=8}function b(r,n,e,t,o,i){var a,f,u,c,w=new Uint32Array(17),y=new Uint32Array(17),l=new Uint32Array(17),s=new Uint32Array(17),h=new Uint32Array(17);for(u=0;17>u;u++)y[u]=l[u]=0;for(u=0;16>u;u++)y[u]=i[u];for(y[3]&=15,y[4]&=252,y[7]&=15,y[8]&=252,y[11]&=15,y[12]&=252,y[15]&=15;o>0;){for(u=0;17>u;u++)s[u]=0;for(u=0;16>u&&o>u;++u)s[u]=e[t+u];for(s[u]=1,t+=u,o-=u,v(l,s),f=0;17>f;f++)for(w[f]=0,u=0;17>u;u++)w[f]=w[f]+l[u]*(f>=u?y[f-u]:320*y[f+17-u]|0)|0|0;for(f=0;17>f;f++)l[f]=w[f];for(c=0,u=0;16>u;u++)c=c+l[u]|0,l[u]=255&c,c>>>=8;for(c=c+l[16]|0,l[16]=3&c,c=5*(c>>>2)|0,u=0;16>u;u++)c=c+l[u]|0,l[u]=255&c,c>>>=8;c=c+l[16]|0,l[16]=c}for(u=0;17>u;u++)h[u]=l[u];for(v(l,Sn),a=0|-(l[16]>>>7),u=0;17>u;u++)l[u]^=a&(h[u]^l[u]);for(u=0;16>u;u++)s[u]=i[u+16];for(s[16]=0,v(l,s),u=0;16>u;u++)r[n+u]=l[u];return 0}function p(r,n,e,t,o,i){var a=new Uint8Array(16);return b(a,0,e,t,o,i),f(r,n,a,0)}function A(r,n,e,t,o){var i;if(32>e)return-1;for(g(r,0,n,0,e,t,o),b(r,16,r,32,e-32,r),i=0;16>i;i++)r[i]=0;return 0}function _(r,n,e,t,o){var i,a=new Uint8Array(32);if(32>e)return-1;if(h(a,0,32,t,o),0!==p(n,16,n,32,e-32,a))return-1;for(g(r,0,n,0,e,t,o),i=0;32>i;i++)r[i]=0;return 0}function U(r,n){var e;for(e=0;16>e;e++)r[e]=0|n[e]}function d(r){var n,e;for(e=0;16>e;e++)r[e]+=65536,n=Math.floor(r[e]/65536),r[(e+1)*(15>e?1:0)]+=n-1+37*(n-1)*(15===e?1:0),r[e]-=65536*n}function E(r,n,e){for(var t,o=~(e-1),i=0;16>i;i++)t=o&(r[i]^n[i]),r[i]^=t,n[i]^=t}function x(r,n){var e,t,o,i=hn(),a=hn();for(e=0;16>e;e++)a[e]=n[e];for(d(a),d(a),d(a),t=0;2>t;t++){for(i[0]=a[0]-65517,e=1;15>e;e++)i[e]=a[e]-65535-(i[e-1]>>16&1),i[e-1]&=65535;i[15]=a[15]-32767-(i[14]>>16&1),o=i[15]>>16&1,i[14]&=65535,E(a,i,1-o)}for(e=0;16>e;e++)r[2*e]=255&a[e],r[2*e+1]=a[e]>>8}function m(r,n){var e=new Uint8Array(32),t=new Uint8Array(32);return x(e,r),x(t,n),u(e,0,t,0)}function B(r){var n=new Uint8Array(32);return x(n,r),1&n[0]}function S(r,n){var e;for(e=0;16>e;e++)r[e]=n[2*e]+(n[2*e+1]<<8);r[15]&=32767}function T(r,n,e){var t;for(t=0;16>t;t++)r[t]=n[t]+e[t]|0}function Y(r,n,e){var t;for(t=0;16>t;t++)r[t]=n[t]-e[t]|0}function K(r,n,e){var t,o,i=new Float64Array(31);for(t=0;31>t;t++)i[t]=0;for(t=0;16>t;t++)for(o=0;16>o;o++)i[t+o]+=n[t]*e[o];for(t=0;15>t;t++)i[t]+=38*i[t+16];for(t=0;16>t;t++)r[t]=i[t];d(r),d(r)}function C(r,n){K(r,n,n)}function L(r,n){var e,t=hn();for(e=0;16>e;e++)t[e]=n[e];for(e=253;e>=0;e--)C(t,t),2!==e&&4!==e&&K(t,t,n);for(e=0;16>e;e++)r[e]=t[e]}function R(r,n){var e,t=hn();for(e=0;16>e;e++)t[e]=n[e];for(e=250;e>=0;e--)C(t,t),1!==e&&K(t,t,n);for(e=0;16>e;e++)r[e]=t[e]}function k(r,n,e){var t,o,i=new Uint8Array(32),a=new Float64Array(80),f=hn(),u=hn(),c=hn(),w=hn(),y=hn(),l=hn();for(o=0;31>o;o++)i[o]=n[o];for(i[31]=127&n[31]|64,i[0]&=248,S(a,e),o=0;16>o;o++)u[o]=a[o],w[o]=f[o]=c[o]=0;for(f[0]=w[0]=1,o=254;o>=0;--o)t=i[o>>>3]>>>(7&o)&1,E(f,u,t),E(c,w,t),T(y,f,c),Y(f,f,c),T(c,u,w),Y(u,u,w),C(w,y),C(l,f),K(f,c,f),K(c,u,y),T(y,f,c),Y(f,f,c),C(u,f),Y(c,w,l),K(f,c,_n),T(f,f,w),K(c,c,f),K(f,w,l),K(w,u,a),C(u,y),E(f,u,t),E(c,w,t);for(o=0;16>o;o++)a[o+16]=f[o],a[o+32]=c[o],a[o+48]=u[o],a[o+64]=w[o];var s=a.subarray(32),h=a.subarray(16);return L(s,s),K(h,h,s),x(r,h),0}function z(r,n){return k(r,n,bn)}function P(r,n){return gn(n,32),z(r,n)}function F(r,n,e){var t=new Uint8Array(32);return k(t,e,n),y(r,vn,t,Bn)}function N(r,n,e,t,o,i){var a=new Uint8Array(32);return F(a,o,i),Tn(r,n,e,t,a)}function O(r,n,e,t,o,i){var a=new Uint8Array(32);return F(a,o,i),Yn(r,n,e,t,a)}function M(){var r,n,e,t=0,o=0,i=0,a=0,f=65535;for(e=0;e<arguments.length;e++)r=arguments[e].lo,n=arguments[e].hi,t+=r&f,o+=r>>>16,i+=n&f,a+=n>>>16;return o+=t>>>16,i+=o>>>16,a+=i>>>16,new sn(i&f|a<<16,t&f|o<<16)}function G(r,n){return new sn(r.hi>>>n,r.lo>>>n|r.hi<<32-n)}function I(){var r,n=0,e=0;for(r=0;r<arguments.length;r++)n^=arguments[r].lo,e^=arguments[r].hi;return new sn(e,n)}function Z(r,n){var e,t,o=32-n;return 32>n?(e=r.hi>>>n|r.lo<<o,t=r.lo>>>n|r.hi<<o):64>n&&(e=r.lo>>>n|r.hi<<o,t=r.hi>>>n|r.lo<<o),new sn(e,t)}function j(r,n,e){var t=r.hi&n.hi^~r.hi&e.hi,o=r.lo&n.lo^~r.lo&e.lo;return new sn(t,o)}function V(r,n,e){var t=r.hi&n.hi^r.hi&e.hi^n.hi&e.hi,o=r.lo&n.lo^r.lo&e.lo^n.lo&e.lo;return new sn(t,o)}function q(r){return I(Z(r,28),Z(r,34),Z(r,39))}function X(r){return I(Z(r,14),Z(r,18),Z(r,41))}function D(r){return I(Z(r,1),Z(r,8),G(r,7))}function H(r){return I(Z(r,19),Z(r,61),G(r,6))}function J(r,n,e){var o,a,f,u=[],c=[],w=[],y=[];for(a=0;8>a;a++)u[a]=w[a]=t(r,8*a);for(var l=0;e>=128;){for(a=0;16>a;a++)y[a]=t(n,8*a+l);for(a=0;80>a;a++){for(f=0;8>f;f++)c[f]=w[f];for(o=M(w[7],X(w[4]),j(w[4],w[5],w[6]),Kn[a],y[a%16]),c[7]=M(o,q(w[0]),V(w[0],w[1],w[2])),c[3]=M(c[3],o),f=0;8>f;f++)w[(f+1)%8]=c[f];if(a%16===15)for(f=0;16>f;f++)y[f]=M(y[f],y[(f+9)%16],D(y[(f+1)%16]),H(y[(f+14)%16]))}for(a=0;8>a;a++)w[a]=M(w[a],u[a]),u[a]=w[a];l+=128,e-=128}for(a=0;8>a;a++)i(r,8*a,u[a]);return e}function Q(r,n,e){var t,o=new Uint8Array(64),a=new Uint8Array(256),f=e;for(t=0;64>t;t++)o[t]=Cn[t];for(J(o,n,e),e%=128,t=0;256>t;t++)a[t]=0;for(t=0;e>t;t++)a[t]=n[f-e+t];for(a[e]=128,e=256-128*(112>e?1:0),a[e-9]=0,i(a,e-8,new sn(f/536870912|0,f<<3)),J(o,a,e),t=0;64>t;t++)r[t]=o[t];return 0}function W(r,n){var e=hn(),t=hn(),o=hn(),i=hn(),a=hn(),f=hn(),u=hn(),c=hn(),w=hn();Y(e,r[1],r[0]),Y(w,n[1],n[0]),K(e,e,w),T(t,r[0],r[1]),T(w,n[0],n[1]),K(t,t,w),K(o,r[3],n[3]),K(o,o,dn),K(i,r[2],n[2]),T(i,i,i),Y(a,t,e),Y(f,i,o),T(u,i,o),T(c,t,e),K(r[0],a,f),K(r[1],c,u),K(r[2],u,f),K(r[3],a,c)}function $(r,n,e){var t;for(t=0;4>t;t++)E(r[t],n[t],e)}function rn(r,n){var e=hn(),t=hn(),o=hn();L(o,n[2]),K(e,n[0],o),K(t,n[1],o),x(r,t),r[31]^=B(e)<<7}function nn(r,n,e){var t,o;for(U(r[0],pn),U(r[1],An),U(r[2],An),U(r[3],pn),o=255;o>=0;--o)t=e[o/8|0]>>(7&o)&1,$(r,n,t),W(n,r),W(r,r),$(r,n,t)}function en(r,n){var e=[hn(),hn(),hn(),hn()];U(e[0],En),U(e[1],xn),U(e[2],An),K(e[3],En,xn),nn(r,e,n)}function tn(r,n){var e,t=new Uint8Array(64),o=[hn(),hn(),hn(),hn()];for(gn(n,32),Q(t,n,32),t[0]&=248,t[31]&=127,t[31]|=64,en(o,t),rn(r,o),e=0;32>e;e++)n[e+32]=r[e];return 0}function on(r,n){var e,t,o,i;for(t=63;t>=32;--t){for(e=0,o=t-32,i=t-12;i>o;++o)n[o]+=e-16*n[t]*Ln[o-(t-32)],e=n[o]+128>>8,n[o]-=256*e;n[o]+=e,n[t]=0}for(e=0,o=0;32>o;o++)n[o]+=e-(n[31]>>4)*Ln[o],e=n[o]>>8,n[o]&=255;for(o=0;32>o;o++)n[o]-=e*Ln[o];for(t=0;32>t;t++)n[t+1]+=n[t]>>8,r[t]=255&n[t]}function an(r){var n,e=new Float64Array(64);for(n=0;64>n;n++)e[n]=r[n];for(n=0;64>n;n++)r[n]=0;on(r,e)}function fn(r,n,e,t){var o,i,a=new Uint8Array(64),f=new Uint8Array(64),u=new Uint8Array(64),c=new Float64Array(64),w=[hn(),hn(),hn(),hn()];Q(a,t,32),a[0]&=248,a[31]&=127,a[31]|=64;var y=e+64;for(o=0;e>o;o++)r[64+o]=n[o];for(o=0;32>o;o++)r[32+o]=a[32+o];for(Q(u,r.subarray(32),e+32),an(u),en(w,u),rn(r,w),o=32;64>o;o++)r[o]=t[o];for(Q(f,r,e+64),an(f),o=0;64>o;o++)c[o]=0;for(o=0;32>o;o++)c[o]=u[o];for(o=0;32>o;o++)for(i=0;32>i;i++)c[o+i]+=f[o]*a[i];return on(r.subarray(32),c),y}function un(r,n){var e=hn(),t=hn(),o=hn(),i=hn(),a=hn(),f=hn(),u=hn();return U(r[2],An),S(r[1],n),C(o,r[1]),K(i,o,Un),Y(o,o,r[2]),T(i,r[2],i),C(a,i),C(f,a),K(u,f,a),K(e,u,o),K(e,e,i),R(e,e),K(e,e,o),K(e,e,i),K(e,e,i),K(r[0],e,i),C(t,r[0]),K(t,t,i),m(t,o)&&K(r[0],r[0],mn),C(t,r[0]),K(t,t,i),m(t,o)?-1:(B(r[0])===n[31]>>7&&Y(r[0],pn,r[0]),K(r[3],r[0],r[1]),0)}function cn(r,n,e,t){var o,i,a=new Uint8Array(32),f=new Uint8Array(64),c=[hn(),hn(),hn(),hn()],w=[hn(),hn(),hn(),hn()];if(i=-1,64>e)return-1;if(un(w,t))return-1;for(o=0;e>o;o++)r[o]=n[o];for(o=0;32>o;o++)r[o+32]=t[o];if(Q(f,r,e),an(f),nn(c,w,f),en(w,n.subarray(32)),W(c,w),rn(a,c),e-=64,u(n,0,a,0)){for(o=0;e>o;o++)r[o]=0;return-1}for(o=0;e>o;o++)r[o]=n[o+64];return i=e}function wn(r,n){if(r.length!==Rn)throw new Error("bad key size");if(n.length!==kn)throw new Error("bad nonce size")}function yn(r,n){if(r.length!==On)throw new Error("bad public key size");if(n.length!==Mn)throw new Error("bad secret key size")}function ln(){for(var r,n={}.toString,e=0;e<arguments.length;e++)if("[object Uint8Array]"!==(r=n.call(arguments[e])))throw new TypeError("unexpected type "+r+", use Uint8Array")}var sn=function(r,n){this.hi=0|r,this.lo=0|n},hn=function(r){var n,e=new Float64Array(16);if(r)for(n=0;n<r.length;n++)e[n]=r[n];return e},gn=function(){throw new Error("no PRNG")},vn=new Uint8Array(16),bn=new Uint8Array(32);bn[0]=9;var pn=hn(),An=hn([1]),_n=hn([56129,1]),Un=hn([30883,4953,19914,30187,55467,16705,2637,112,59544,30585,16505,36039,65139,11119,27886,20995]),dn=hn([61785,9906,39828,60374,45398,33411,5274,224,53552,61171,33010,6542,64743,22239,55772,9222]),En=hn([54554,36645,11616,51542,42930,38181,51040,26924,56412,64982,57905,49316,21502,52590,14035,8553]),xn=hn([26200,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214,26214]),mn=hn([41136,18958,6951,50414,58488,44335,6150,12099,55207,15867,153,11085,57099,20417,9344,11139]),Bn=new Uint8Array([101,120,112,97,110,100,32,51,50,45,98,121,116,101,32,107]),Sn=new Uint32Array([5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,252]),Tn=A,Yn=_,Kn=[new sn(1116352408,3609767458),new sn(1899447441,602891725),new sn(3049323471,3964484399),new sn(3921009573,2173295548),new sn(961987163,4081628472),new sn(1508970993,3053834265),new sn(2453635748,2937671579),new sn(2870763221,3664609560),new sn(3624381080,2734883394),new sn(310598401,1164996542),new sn(607225278,1323610764),new sn(1426881987,3590304994),new sn(1925078388,4068182383),new sn(2162078206,991336113),new sn(2614888103,633803317),new sn(3248222580,3479774868),new sn(3835390401,2666613458),new sn(4022224774,944711139),new sn(264347078,2341262773),new sn(604807628,2007800933),new sn(770255983,1495990901),new sn(1249150122,1856431235),new sn(1555081692,3175218132),new sn(1996064986,2198950837),new sn(2554220882,3999719339),new sn(2821834349,766784016),new sn(2952996808,2566594879),new sn(3210313671,3203337956),new sn(3336571891,1034457026),new sn(3584528711,2466948901),new sn(113926993,3758326383),new sn(338241895,168717936),new sn(666307205,1188179964),new sn(773529912,1546045734),new sn(1294757372,1522805485),new sn(1396182291,2643833823),new sn(1695183700,2343527390),new sn(1986661051,1014477480),new sn(2177026350,1206759142),new sn(2456956037,344077627),new sn(2730485921,1290863460),new sn(2820302411,3158454273),new sn(3259730800,3505952657),new sn(3345764771,106217008),new sn(3516065817,3606008344),new sn(3600352804,1432725776),new sn(4094571909,1467031594),new sn(275423344,851169720),new sn(430227734,3100823752),new sn(506948616,1363258195),new sn(659060556,3750685593),new sn(883997877,3785050280),new sn(958139571,3318307427),new sn(1322822218,3812723403),new sn(1537002063,2003034995),new sn(1747873779,3602036899),new sn(1955562222,1575990012),new sn(2024104815,1125592928),new sn(2227730452,2716904306),new sn(2361852424,442776044),new sn(2428436474,593698344),new sn(2756734187,3733110249),new sn(3204031479,2999351573),new sn(3329325298,3815920427),new sn(3391569614,3928383900),new sn(3515267271,566280711),new sn(3940187606,3454069534),new sn(4118630271,4000239992),new sn(116418474,1914138554),new sn(174292421,2731055270),new sn(289380356,3203993006),new sn(460393269,320620315),new sn(685471733,587496836),new sn(852142971,1086792851),new sn(1017036298,365543100),new sn(1126000580,2618297676),new sn(1288033470,3409855158),new sn(1501505948,4234509866),new sn(1607167915,987167468),new sn(1816402316,1246189591)],Cn=new Uint8Array([106,9,230,103,243,188,201,8,187,103,174,133,132,202,167,59,60,110,243,114,254,148,248,43,165,79,245,58,95,29,54,241,81,14,82,127,173,230,130,209,155,5,104,140,43,62,108,31,31,131,217,171,251,65,189,107,91,224,205,25,19,126,33,121]),Ln=new Float64Array([237,211,245,92,26,99,18,88,214,156,247,162,222,249,222,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16]),Rn=32,kn=24,zn=32,Pn=16,Fn=32,Nn=32,On=32,Mn=32,Gn=32,In=kn,Zn=zn,jn=Pn,Vn=64,qn=32,Xn=64,Dn=64;r.lowlevel={crypto_stream_xor:g,crypto_stream:h,crypto_stream_salsa20_xor:l,crypto_stream_salsa20:s,crypto_onetimeauth:b,crypto_onetimeauth_verify:p,crypto_verify_16:f,crypto_verify_32:u,crypto_secretbox:A,crypto_secretbox_open:_,crypto_scalarmult:k,crypto_scalarmult_base:z,crypto_box_beforenm:F,crypto_box_afternm:Tn,crypto_box:N,crypto_box_open:O,crypto_box_keypair:P,crypto_hash:Q,crypto_hashblocks:J,crypto_sign:fn,crypto_sign_keypair:tn,crypto_sign_open:cn,crypto_secretbox_KEYBYTES:Rn,crypto_secretbox_NONCEBYTES:kn,crypto_secretbox_ZEROBYTES:zn,crypto_secretbox_BOXZEROBYTES:Pn,crypto_scalarmult_BYTES:Fn,crypto_scalarmult_SCALARBYTES:Nn,crypto_box_PUBLICKEYBYTES:On,crypto_box_SECRETKEYBYTES:Mn,crypto_box_BEFORENMBYTES:Gn,crypto_box_NONCEBYTES:In,crypto_box_ZEROBYTES:Zn,crypto_box_BOXZEROBYTES:jn,crypto_sign_BYTES:Vn,crypto_sign_PUBLICKEYBYTES:qn,crypto_sign_SECRETKEYBYTES:Xn,crypto_hash_BYTES:Dn},r.util={},r.util.decodeUTF8=function(r){var n,e=unescape(encodeURIComponent(r)),t=new Uint8Array(e.length);for(n=0;n<e.length;n++)t[n]=e.charCodeAt(n);return t},r.util.encodeUTF8=function(r){var n,e=[];for(n=0;n<r.length;n++)e.push(String.fromCharCode(r[n]));return decodeURIComponent(escape(e.join("")))},r.util.encodeBase64=function(r){if("undefined"==typeof btoa)return new Buffer(r).toString("base64");var n,e=[],t=r.length;for(n=0;t>n;n++)e.push(String.fromCharCode(r[n]));return btoa(e.join(""))},r.util.decodeBase64=function(r){if("undefined"==typeof atob)return new Uint8Array(Array.prototype.slice.call(new Buffer(r,"base64"),0));var n,e=atob(r),t=new Uint8Array(e.length);for(n=0;n<e.length;n++)t[n]=e.charCodeAt(n);return t},r.randomBytes=function(r){var n=new Uint8Array(r);return gn(n,r),n},r.secretbox=function(r,n,e){ln(r,n,e),wn(e,n);for(var t=new Uint8Array(zn+r.length),o=new Uint8Array(t.length),i=0;i<r.length;i++)t[i+zn]=r[i];return A(o,t,t.length,n,e),o.subarray(Pn)},r.secretbox.open=function(r,n,e){ln(r,n,e),wn(e,n);for(var t=new Uint8Array(Pn+r.length),o=new Uint8Array(t.length),i=0;i<r.length;i++)t[i+Pn]=r[i];return t.length<32?!1:0!==_(o,t,t.length,n,e)?!1:o.subarray(zn)},r.secretbox.keyLength=Rn,r.secretbox.nonceLength=kn,r.secretbox.overheadLength=Pn,r.scalarMult=function(r,n){if(ln(r,n),r.length!==Nn)throw new Error("bad n size");if(n.length!==Fn)throw new Error("bad p size");var e=new Uint8Array(Fn);return k(e,r,n),e},r.scalarMult.base=function(r){if(ln(r),r.length!==Nn)throw new Error("bad n size");var n=new Uint8Array(Fn);return z(n,r),n},r.scalarMult.scalarLength=Nn,r.scalarMult.groupElementLength=Fn,r.box=function(n,e,t,o){var i=r.box.before(t,o);return r.secretbox(n,e,i)},r.box.before=function(r,n){ln(r,n),yn(r,n);var e=new Uint8Array(Gn);return F(e,r,n),e},r.box.after=r.secretbox,r.box.open=function(n,e,t,o){var i=r.box.before(t,o);return r.secretbox.open(n,e,i)},r.box.open.after=r.secretbox.open,r.box.keyPair=function(){var r=new Uint8Array(On),n=new Uint8Array(Mn);return P(r,n),{publicKey:r,secretKey:n}},r.box.keyPair.fromSecretKey=function(r){if(ln(r),r.length!==Mn)throw new Error("bad secret key size");var n=new Uint8Array(On);return z(n,r),{publicKey:n,secretKey:r}},r.box.publicKeyLength=On,r.box.secretKeyLength=Mn,r.box.sharedKeyLength=Gn,r.box.nonceLength=In,r.box.overheadLength=r.secretbox.overheadLength,r.sign=function(r,n){if(ln(r,n),n.length!==Xn)throw new Error("bad secret key size");var e=new Uint8Array(Vn+r.length);fn(e,r,r.length,n);for(var t=new Uint8Array(Vn),o=0;o<t.length;o++)t[o]=e[o];return t},r.sign.open=function(r,n,e){if(ln(r,n,e),n.length!==Vn)throw new Error("bad signature size");if(e.length!==qn)throw new Error("bad public key size");var t,o=new Uint8Array(Vn+r.length),i=new Uint8Array(Vn+r.length);for(t=0;Vn>t;t++)o[t]=n[t];for(t=0;t<r.length;t++)o[t+Vn]=r[t];var a=cn(i,o,o.length,e);return 0>a?!1:i.subarray(0,a)},r.sign.keyPair=function(){var r=new Uint8Array(qn),n=new Uint8Array(Xn);return tn(r,n),{publicKey:r,secretKey:n}},r.sign.keyPair.fromSecretKey=function(r){if(ln(r),r.length!==Xn)throw new Error("bad secret key size");var n,e=new Uint8Array(qn);for(n=0;32>n;n++)e[n]=r[32+n];return{publicKey:e,secretKey:r}},r.sign.publicKeyLength=qn,r.sign.secretKeyLength=Xn,r.sign.signatureLength=Vn,r.hash=function(r){ln(r);var n=new Uint8Array(Dn);return Q(n,r,r.length),n},r.hash.hashLength=Dn,r.verify=function(r,n){return ln(r,n),0===r.length||0===n.length?!1:r.length!==n.length?!1:0===a(r,0,n,0,r.length)?!0:!1},r.setPRNG=function(r){gn=r},function(){var n;"undefined"!=typeof window?(window.crypto&&window.crypto.getRandomValues?n=window.crypto:window.msCrypto&&window.msCrypto.getRandomValues&&(n=window.msCrypto),n&&r.setPRNG(function(r,e){var t,o=new Uint8Array(e);for(n.getRandomValues(o),t=0;e>t;t++)r[t]=o[t]})):"undefined"!=typeof require&&(n=require("crypto"),n&&r.setPRNG(function(r,e){var t,o=n.randomBytes(e);for(t=0;e>t;t++)r[t]=o[t]}))}()}("undefined"!=typeof module&&module.exports?module.exports:window.nacl=window.nacl||{});
+
+            //from https://github.com/dchest/scrypt-async-js/blob/940cff15a5d627f6849b4cb52b2a949ffb31dfa1/scrypt-async.min.js
+            /*!
+             * Fast "async" scrypt implementation in JavaScript.
+             * Copyright (c) 2013-2014 Dmitry Chestnykh | BSD License
+             * https://github.com/dchest/scrypt-async-js
+             */
+            function scrypt(r,n,t,o,e,u,f,a){"use strict";function h(r){function n(r){for(var n=0,p=r.length;p>=64;){var l,v,g,y,w,d=o,A=e,b=u,m=f,I=a,j=h,x=c,E=s;for(v=0;16>v;v++)g=n+4*v,i[v]=(255&r[g])<<24|(255&r[g+1])<<16|(255&r[g+2])<<8|255&r[g+3];for(v=16;64>v;v++)l=i[v-2],y=(l>>>17|l<<15)^(l>>>19|l<<13)^l>>>10,l=i[v-15],w=(l>>>7|l<<25)^(l>>>18|l<<14)^l>>>3,i[v]=(y+i[v-7]|0)+(w+i[v-16]|0)|0;for(v=0;64>v;v++)y=(((I>>>6|I<<26)^(I>>>11|I<<21)^(I>>>25|I<<7))+(I&j^~I&x)|0)+(E+(t[v]+i[v]|0)|0)|0,w=((d>>>2|d<<30)^(d>>>13|d<<19)^(d>>>22|d<<10))+(d&A^d&b^A&b)|0,E=x,x=j,j=I,I=m+y|0,m=b,b=A,A=d,d=y+w|0;o=o+d|0,e=e+A|0,u=u+b|0,f=f+m|0,a=a+I|0,h=h+j|0,c=c+x|0,s=s+E|0,n+=64,p-=64}}var t=[1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298],o=1779033703,e=3144134277,u=1013904242,f=2773480762,a=1359893119,h=2600822924,c=528734635,s=1541459225,i=new Array(64);n(r);var p,l=r.length%64,v=r.length/536870912|0,g=r.length<<3,y=56>l?56:120,w=r.slice(r.length-l,r.length);for(w.push(128),p=l+1;y>p;p++)w.push(0);return w.push(v>>>24&255),w.push(v>>>16&255),w.push(v>>>8&255),w.push(v>>>0&255),w.push(g>>>24&255),w.push(g>>>16&255),w.push(g>>>8&255),w.push(g>>>0&255),n(w),[o>>>24&255,o>>>16&255,o>>>8&255,o>>>0&255,e>>>24&255,e>>>16&255,e>>>8&255,e>>>0&255,u>>>24&255,u>>>16&255,u>>>8&255,u>>>0&255,f>>>24&255,f>>>16&255,f>>>8&255,f>>>0&255,a>>>24&255,a>>>16&255,a>>>8&255,a>>>0&255,h>>>24&255,h>>>16&255,h>>>8&255,h>>>0&255,c>>>24&255,c>>>16&255,c>>>8&255,c>>>0&255,s>>>24&255,s>>>16&255,s>>>8&255,s>>>0&255]}function c(r,n,t){function o(){for(var r=u-1;r>=u-4;r--){if(f[r]++,f[r]<=255)return;f[r]=0}}r=r.length<=64?r:h(r);var e,u=64+n.length+4,f=new Array(u),a=new Array(64),c=[];for(e=0;64>e;e++)f[e]=54;for(e=0;e<r.length;e++)f[e]^=r[e];for(e=0;e<n.length;e++)f[64+e]=n[e];for(e=u-4;u>e;e++)f[e]=0;for(e=0;64>e;e++)a[e]=92;for(e=0;e<r.length;e++)a[e]^=r[e];for(;t>=32;)o(),c=c.concat(h(a.concat(h(f)))),t-=32;return t>0&&(o(),c=c.concat(h(a.concat(h(f))).slice(0,t))),c}function s(r,n,t,o){var e,u,f=r[0]^n[t++],a=r[1]^n[t++],h=r[2]^n[t++],c=r[3]^n[t++],s=r[4]^n[t++],i=r[5]^n[t++],p=r[6]^n[t++],l=r[7]^n[t++],v=r[8]^n[t++],g=r[9]^n[t++],y=r[10]^n[t++],w=r[11]^n[t++],d=r[12]^n[t++],A=r[13]^n[t++],b=r[14]^n[t++],m=r[15]^n[t++],I=f,j=a,x=h,E=c,C=s,N=i,T=p,k=l,q=v,z=g,B=y,D=w,F=d,G=A,H=b,J=m;for(u=0;8>u;u+=2)e=I+F,C^=e<<7|e>>>25,e=C+I,q^=e<<9|e>>>23,e=q+C,F^=e<<13|e>>>19,e=F+q,I^=e<<18|e>>>14,e=N+j,z^=e<<7|e>>>25,e=z+N,G^=e<<9|e>>>23,e=G+z,j^=e<<13|e>>>19,e=j+G,N^=e<<18|e>>>14,e=B+T,H^=e<<7|e>>>25,e=H+B,x^=e<<9|e>>>23,e=x+H,T^=e<<13|e>>>19,e=T+x,B^=e<<18|e>>>14,e=J+D,E^=e<<7|e>>>25,e=E+J,k^=e<<9|e>>>23,e=k+E,D^=e<<13|e>>>19,e=D+k,J^=e<<18|e>>>14,e=I+E,j^=e<<7|e>>>25,e=j+I,x^=e<<9|e>>>23,e=x+j,E^=e<<13|e>>>19,e=E+x,I^=e<<18|e>>>14,e=N+C,T^=e<<7|e>>>25,e=T+N,k^=e<<9|e>>>23,e=k+T,C^=e<<13|e>>>19,e=C+k,N^=e<<18|e>>>14,e=B+z,D^=e<<7|e>>>25,e=D+B,q^=e<<9|e>>>23,e=q+D,z^=e<<13|e>>>19,e=z+q,B^=e<<18|e>>>14,e=J+H,F^=e<<7|e>>>25,e=F+J,G^=e<<9|e>>>23,e=G+F,H^=e<<13|e>>>19,e=H+G,J^=e<<18|e>>>14;n[o++]=r[0]=I+f|0,n[o++]=r[1]=j+a|0,n[o++]=r[2]=x+h|0,n[o++]=r[3]=E+c|0,n[o++]=r[4]=C+s|0,n[o++]=r[5]=N+i|0,n[o++]=r[6]=T+p|0,n[o++]=r[7]=k+l|0,n[o++]=r[8]=q+v|0,n[o++]=r[9]=z+g|0,n[o++]=r[10]=B+y|0,n[o++]=r[11]=D+w|0,n[o++]=r[12]=F+d|0,n[o++]=r[13]=G+A|0,n[o++]=r[14]=H+b|0,n[o++]=r[15]=J+m|0}function i(r,n,t,o,e){for(;e--;)r[n++]=t[o++]}function p(r,n,t,o,e){for(;e--;)r[n++]^=t[o++]}function l(r,n,t,o,e){i(r,0,n,t+16*(2*e-1),16);for(var u=0;2*e>u;u+=2)s(r,n,t+16*u,o+8*u),s(r,n,t+16*u+16,o+8*u+16*e)}function v(r,n,t){return r[n+16*(2*t-1)]}function g(r){for(var n=[],t=0;t<r.length;t++){var o=r.charCodeAt(t);128>o?n.push(o):o>127&&2048>o?(n.push(o>>6|192),n.push(63&o|128)):(n.push(o>>12|224),n.push(o>>6&63|128),n.push(64&o|128))}return n}function y(r){for(var n="0123456789abcdef".split(""),t=r.length,o=[],e=0;t>e;e++)o.push(n[r[e]>>>4&15]),o.push(n[r[e]>>>0&15]);return o.join("")}function w(r){for(var n,t,o,e,u="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split(""),f=r.length,a=[],h=0;f>h;)n=f>h?r[h++]:0,t=f>h?r[h++]:0,o=f>h?r[h++]:0,e=(n<<16)+(t<<8)+o,a.push(u[e>>>18&63]),a.push(u[e>>>12&63]),a.push(u[e>>>6&63]),a.push(u[e>>>0&63]);return f%3>0&&(a[a.length-1]="=",f%3==1&&(a[a.length-2]="=")),a.join("")}function d(){for(var r=0;32*o>r;r++){var n=4*r;x[q+r]=(255&C[n+3])<<24|(255&C[n+2])<<16|(255&C[n+1])<<8|(255&C[n+0])<<0}}function A(r,n){for(var t=r;n>t;t+=2)i(E,32*t*o,x,q,32*o),l(N,x,q,z,o),i(E,32*(t+1)*o,x,z,32*o),l(N,x,z,q,o)}function b(r,n){for(var t=r;n>t;t+=2){var e=v(x,q,o)&k-1;p(x,q,E,32*e*o,32*o),l(N,x,q,z,o),e=v(x,z,o)&k-1,p(x,z,E,32*e*o,32*o),l(N,x,z,q,o)}}function m(){for(var r=0;32*o>r;r++){var n=x[q+r];C[4*r+0]=n>>>0&255,C[4*r+1]=n>>>8&255,C[4*r+2]=n>>>16&255,C[4*r+3]=n>>>24&255}}function I(r,n,t,o,e){!function u(){setTimeout(function(){o(r,n>r+t?r+t:n),r+=t,n>r?u():e()},0)}()}var j=1;if(1>t||t>31)throw new Error("scrypt: logN not be between 1 and 31");var x,E,C,N,T=1<<31>>>0,k=1<<t>>>0;if(o*j>=1<<30||o>T/128/j||o>T/256||k>T/128/o)throw new Error("scrypt: parameters are too large");"string"==typeof r&&(r=g(r)),"string"==typeof n&&(n=g(n)),"undefined"!=typeof Int32Array?(x=new Int32Array(64*o),E=new Int32Array(32*k*o),N=new Int32Array(16)):(x=[],E=[],N=new Array(16)),C=c(r,n,128*j*o);var q=0,z=32*o;u||(u=1e3),d(),I(0,k,2*u,A,function(){I(0,k,2*u,b,function(){m();var n=c(r,C,e);f("base64"==a?w(n):"hex"==a?y(n):n)})})}"undefined"!=typeof module&&(module.exports=scrypt);
+
+            //from https://github.com/kaepora/miniLock/blob/144c6c531625531903b851c0954cf183ecd5984e/src/js/lib/base58.js
+            //minified using http://refresh-sf.com/yui/
+            var Base58={};Base58.alphabet="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";Base58.alphabetMap={};for(var i=0;i<Base58.alphabet.length;i++){Base58.alphabetMap[Base58.alphabet.charAt(i)]=i}Base58.encode=function(a){if(a.length===0){return""}var c,b,d=[0];for(c=0;c<a.length;c++){for(b=0;b<d.length;b++){d[b]<<=8}d[d.length-1]+=a[c];var e=0;for(b=d.length-1;b>=0;b--){d[b]+=e;e=(d[b]/58)|0;d[b]%=58}while(e){d.unshift(e);e=(d[0]/58)|0;d[0]%=58}}for(c=0;c<a.length-1&&a[c]==0;c++){d.unshift(0)}return d.map(function(f){return Base58.alphabet[f]}).join("")};Base58.decode=function(d){if(d.length===0){return(new Uint8Array())}var b=d.split("").map(function(g){return Base58.alphabetMap[g]});var e,c,a=[0];for(e=0;e<b.length;e++){for(c=0;c<a.length;c++){a[c]*=58}a[a.length-1]+=b[e];var f=0;for(c=a.length-1;c>=0;c--){a[c]+=f;f=a[c]>>8;a[c]&=255}while(f){a.unshift(f);f=a[0]>>8;a[0]&=255}}for(e=0;e<b.length-1&&b[e]==0;e++){a.unshift(0)}return(new Uint8Array(a))};
+        </script>
+
+        <!-- Core myLock Library -->
+        <script>
+            var myLockCore = (function(){
+                "use strict";
+                //internal key
+                var key = {
+                    "secretKey": null,
+                    "publicKey": null,
+                    "username": null,
+                };
+
+                //encode username to Base58
+                function _encodeUsername(publicKey, salt){
+                    var tmp = new Uint8Array(40);
+                    tmp.set(new Uint8Array(publicKey), 0);
+                    tmp.set(new Uint8Array(salt), 32);
+                    return "myLock_" + Base58.encode(tmp);
+                }
+
+                //decode username from Base58 to {publicKey:<Uint8Array>, salt:<Uint8Array>}
+                //returns undefined if invalid username
+                function _decodeUsername(username){
+                    if(username.substring(0, 7) === "myLock_"){
+                        username = username.substring(7);
+                    }
+	                var tmp = Base58.decode(username);
+                    if(tmp.byteLength === 40){
+                        return {
+	                        "publicKey": tmp.subarray(0, 32),
+	                        "salt": tmp.subarray(32, 40),
+                        };
+                    }
+                    return undefined;
+                }
+
+                //default callbacks (do nothing)
+                this.onUsernameDone = function(error){};
+                this.onEncryptDone = function(data, error){};
+                this.onEncryptProgress = function(progress){};
+                this.onDecryptDone = function(data, error){};
+                this.onDecryptProgress = function(progress){};
+
+                //set keys
+                this.setUsername = function(username, passphrase){
+                    //generate a new username
+                    if(username === undefined){
+                        //passphrases must be over 40 charaters long
+                        if(passphrase.length < 40){
+                            this.onUsernameDone("Secret phrase needs 40+ characters");
+                            return;
+                        }
+                        var salt = nacl.randomBytes(8);
+                    }
+                    //validate an existing username
+                    else{
+                        var tmpUser = _decodeUsername(username);
+                        if(tmpUser === undefined){
+                            this.onUsernameDone("Bad username or secret phrase");
+                            return;
+                        }
+                        var salt = tmpUser.salt;
+                    }
+
+                    //generate scrypt secretKey from salt and hashed passphrase
+                    var onScryptDone = this.onUsernameDone;
+                    var hashed_passphrase = nacl.hash(nacl.util.decodeUTF8(passphrase));
+                    scrypt(salt, hashed_passphrase, 17, 8, 32, 1000, function(bytes){
+
+                        //determine the keyPair and username
+                        var scryptKeys = nacl.box.keyPair.fromSecretKey(new Uint8Array(bytes));
+                        var scryptUser = _encodeUsername(scryptKeys.publicKey, salt);
+
+                        //if the username was already given, validate it
+                        if(username !== undefined){
+                            if(username.substring(0, 7) !== "myLock_"){
+                                username = "myLock_" + username;
+                            }
+                            if(username !== scryptUser){
+                                onScryptDone("Bad username or secret phrase");
+                                return;
+                            }
+                        }
+
+                        //set the internal session keys
+                        key['secretKey'] = scryptKeys.secretKey;
+                        key['publicKey'] = scryptKeys.publicKey;
+                        key['username'] = scryptUser;
+
+                        //fire the success event
+                        onScryptDone();
+                    });
+                };
+
+                //get username
+                this.getUsername = function(){
+                    return key.username;
+                };
+
+                //encrypt
+                this.encrypt = function(filename, file, recipients){
+                    this.onEncryptProgress(0);
+
+                    //make sure the user's secret key is set
+                    if(key['username'] === null || key['secretKey'] === null){
+                        this.onEncryptDone(null, "Not logged in");
+                        return;
+                    }
+
+                    //make sure there are actually recipients
+                    if(recipients.length <= 0){
+                        this.onEncryptDone(null, "No recipients set");
+                        return;
+                    }
+
+                    //generate a file encryption key
+                    var fileKey = nacl.randomBytes(32);
+                    var fileNonce = nacl.randomBytes(24);
+
+                    //encrypt a userInfo for each recipient in this format:
+                    //{
+                    //    "ephemeralPublicKey": <Base58>,
+                    //    "userInfoNonce": <Base58>,
+                    //    "userInfoEncrypted": {
+                    //        "sender": <username>,
+                    //        "fileInfo": {
+                    //            "fileInfoNonce": <Base58>,
+                    //            "fileInfoEncrypted": {
+                    //                "fileName": <String>,
+                    //                "fileType": <MIME-type>,
+                    //                "fileNonce": <Base58>,
+                    //                "fileKey": <Base58>,
+                    //            } (encrypted with recipient.publicKey, fileInfoNonce, and sender.secretKey),
+                    //        },
+                    //    } (encrypted with recipient.publicKey, userInfoNonce, and ephemeral.secretKey),
+                    //}
+                    var userInfos = [];
+                    for(var i = 0; i < recipients.length; i++){
+
+                        //make sure this is a valid username
+                        var tmpUser = _decodeUsername(recipients[i]);
+                        if(tmpUser === undefined){
+                            this.onEncryptDone("Some recipients aren't valid");
+                            return;
+                        }
+
+                        //encrypt the fileKey with the sender's signature
+                        var fileInfoNonce = nacl.randomBytes(24);
+                        var fileInfoEncrypted = nacl.box(
+                            nacl.util.decodeUTF8(JSON.stringify({
+                                "fileName": filename,
+                                "fileType": file.type,
+                                "fileNonce": Base58.encode(fileNonce),
+                                "fileKey": Base58.encode(fileKey),
+                            })),
+                            fileInfoNonce,
+                            tmpUser.publicKey,
+                            key['secretKey']);
+
+                        //encode the userInfo to unencrypted Uint8Array
+                        var userInfo = nacl.util.decodeUTF8(JSON.stringify({
+                            "sender": key['username'],
+                            "fileInfo": {
+                                "fileInfoNonce": Base58.encode(fileInfoNonce),
+                                "fileInfoEncrypted": Base58.encode(fileInfoEncrypted),
+                            },
+                        }));
+
+                        //encrypt the userInfo
+                        var userEphemeral = nacl.box.keyPair();
+                        var userNonce = nacl.randomBytes(24);
+                        var userInfoEncrypted = nacl.box(
+                            userInfo,
+                            userNonce,
+                            tmpUser.publicKey,
+                            userEphemeral.secretKey);
+
+                        //Base58 encode the userInfo, nonce, and ephemeral into a Base58 key
+                        userInfos.push(Base58.encode(nacl.util.decodeUTF8(JSON.stringify({
+                            "ephemeralPublicKey": Base58.encode(userEphemeral.publicKey),
+                            "userInfoNonce": Base58.encode(userNonce),
+                            "userInfoEncrypted": Base58.encode(userInfoEncrypted),
+                        }))));
+                    }
+
+                    //split each userInfo in the header with a period and
+                    //denote the end of the header with two periods
+                    var header = nacl.util.decodeUTF8(userInfos.join(".") + "..");
+
+                    //read the file into an array buffer
+                    //TODO: chunk the encryption
+                    var onprogress = this.onEncryptProgress;
+                    var ondone = this.onEncryptDone;
+                    var reader = new FileReader();
+                    reader.onload = function(){
+
+                        //encrypt the raw file
+                        var encrypted = nacl.secretbox(
+                            new Uint8Array(reader.result),
+                            fileNonce,
+                            fileKey);
+
+                        //construct the locked file
+                        var blob = new Blob([header, encrypted], {
+                            "type": "application/mylock",
+                        });
+
+                        //fire the success event
+                        onprogress(100);
+                        ondone(blob);
+                    };
+                    reader.readAsArrayBuffer(file);
+                };
+
+                //decrypt
+                this.decrypt = function(file){
+                    this.onDecryptProgress(0);
+
+                    //callback when done reader the file
+                    var onprogress = this.onDecryptProgress;
+                    var ondone = this.onDecryptDone;
+                    function decryptData(data){
+
+                        //split headers into userInfos
+                        var userInfos = [];
+                        var last = 0;
+                        for(var i = 0; i < data.byteLength; i++){
+                            //periods denote headers (".".charCodeAt() === 46)
+                            if(data[i] === 46){
+                                //see if this is the end of the header
+                                if(last === i){
+                                    last = i + 1;
+                                    break;
+                                }
+                                userInfos.push(nacl.util.encodeUTF8(data.subarray(last, i)));
+                                last = i + 1;
+                            }
+                        }
+
+                        //parse userInfos to the following format:
+                        //{
+                        //    "sender": <username>,
+                        //    "filename": <filename>,
+                        //    "fileInfo": {
+                        //        "fileName": <String>,
+                        //        "fileType": <MIME-type>,
+                        //        "fileNonce": <Uint8Array>,
+                        //        "fileKey": <Uint8Array>,
+                        //    },
+                        //}
+                        var userInfo;
+                        for(var i = 0; i < userInfos.length; i++){
+
+                            //try to decode the userInfo
+                            try{
+                                //get the ephemeral json
+                                var tmpInfo = JSON.parse(nacl.util.encodeUTF8(Base58.decode(userInfos[i])));
+
+                                //decrypt the userInfo section
+                                tmpInfo = nacl.box.open(
+                                    Base58.decode(tmpInfo['userInfoEncrypted']),
+                                    Base58.decode(tmpInfo['userInfoNonce']),
+                                    Base58.decode(tmpInfo['ephemeralPublicKey']),
+                                    key['secretKey']);
+
+                                //skip this header if couldn't decrypt
+                                if(tmpInfo === false){
+                                    continue;
+                                }
+
+                                //convert the userInfo from Uint8Array to json
+                                tmpInfo = JSON.parse(nacl.util.encodeUTF8(tmpInfo));
+                            }
+                            catch(e){
+                                console.log(e);
+                                ondone(null, null, null, "Couldn't parse header");
+                                return;
+                            }
+
+                            //validate the sender
+                            var sender = _decodeUsername(tmpInfo['sender']);
+                            if(sender === undefined){
+                                ondone(null, null, null, "Couldn't parse sender");
+                                return;
+                            }
+
+                            //decrypt the fileInfo
+                            try{
+                                var tmpFileInfo = nacl.box.open(
+                                    Base58.decode(tmpInfo['fileInfo']['fileInfoEncrypted']),
+                                    Base58.decode(tmpInfo['fileInfo']['fileInfoNonce']),
+                                    sender.publicKey,
+                                    key['secretKey']);
+
+                                //skip this header if couldn't decrypt
+                                if(tmpFileInfo === false){
+                                    throw "Couldn't decrypt fileInfo";
+                                }
+
+                                //set filename in the userInfo object
+                                tmpInfo['fileInfo'] = JSON.parse(nacl.util.encodeUTF8(tmpFileInfo));
+                                tmpInfo['fileInfo']['fileName'] = tmpInfo['fileInfo']['fileName'] || "file";
+                                tmpInfo['fileInfo']['fileType'] = tmpInfo['fileInfo']['fileType'] || "application/octet-stream";
+                                tmpInfo['fileInfo']['fileKey'] = Base58.decode(tmpInfo['fileInfo']['fileKey']);
+                                tmpInfo['fileInfo']['fileNonce'] = Base58.decode(tmpInfo['fileInfo']['fileNonce']);
+                            }
+                            catch(e){
+                                console.log(e);
+                                ondone(null, null, null, "Couldn't parse header");
+                                return;
+                            }
+
+                            //set userInfo and stop scanning the header
+                            userInfo = tmpInfo;
+                            break;
+                        }
+                        //couldn't read any headers, so bail out
+                        if(userInfo === undefined){
+                            ondone(null, null, null, "Couldn't read any headers");
+                            return;
+                        }
+
+                        //decrypt the file with the fileNonce and fileKey
+                        var decrypted = nacl.secretbox.open(
+                            data.subarray(last, data.byteLength),
+                            userInfo['fileInfo']['fileNonce'],
+                            userInfo['fileInfo']['fileKey']);
+                        if(decrypted === false){
+                            ondone(null, null, null, "Couldn't decrypt file");
+                            return;
+                        }
+
+                        //create blob and return success
+                        onprogress(100);
+                        ondone(
+                            userInfo['sender'],
+                            userInfo['fileInfo']['fileName'],
+                            new Blob([decrypted], {
+                                "type": userInfo['fileInfo']['fileType'],
+                            }));
+                    }
+
+                    //convert file Blob to Uint8Array
+                    var reader = new FileReader();
+                    reader.onload = function(){
+                        decryptData(new Uint8Array(reader.result));
+                    };
+                    reader.readAsArrayBuffer(file);
+                };
+            });
+        </script>
+
+        <!-- User Interface -->
+        <script>
+            var SHOW_ONBOARDING = false;
+            var myLock = new myLockCore();
+
+            //remove element helper function
+            var delElement = function(elem){
+                elem.parentNode.removeChild(elem);
+            }
+
+            /*********************/
+            /*** Page Switcher ***/
+            /*********************/
+
+            //show a particular page
+            function showPage(page){
+
+                //hide everything by default
+                document.getElementById("login").style.display = "none";
+                document.getElementById("header").style.display = "none";
+                document.getElementById("main").style.display = "none";
+                document.getElementById("send").style.display = "none";
+                document.getElementById("receive").style.display = "none";
+
+                //reset and show login page
+                if(page === "login"){
+                    document.getElementById("new_secret").value = "";
+                    document.getElementById("existing_username").value = "";
+                    document.getElementById("existing_secret").value = "";
+                    document.getElementById("register_msg").innerHTML = "(this will generate a new username)";
+                    document.getElementById("register_msg").className = "";
+                    document.getElementById("login_msg").innerHTML = "";
+                    document.getElementById("login_msg").className = "";
+                    document.getElementById("login").style.display = "inline-block";
+                    window.onbeforeunload = null;
+                }
+
+                //reset and show main page
+                else if(page === "main"){
+                    document.getElementById("username").value = myLock.getUsername();
+                    document.getElementById("header").style.display = "inline-block";
+                    document.getElementById("main").style.display = "inline-block";
+                    document.getElementById("tutorial_wrapper").style.display = SHOW_ONBOARDING ? "inline-block" : "none";
+                    window.onbeforeunload = function(){return "Log out?";};
+                }
+
+                //reset and show send page
+                else if(page === "send"){
+                    document.getElementById("username").value = myLock.getUsername();
+                    document.getElementById("header").style.display = "inline-block";
+                    document.getElementById("send").style.display = "inline-block";
+                    document.getElementById("recip").value = "";
+                    window.onbeforeunload = function(){return "Log out?";};
+                    //remove all but first recipient input
+                    var recipInputs = document.querySelectorAll("input.recip_row");
+                    for(var i = 1; i < recipInputs.length; i++){
+                        delElement(recipInputs[i]);
+                    }
+                    //replace the file input (since it can't be cleared)
+                    delElement(document.getElementById("raw_data"));
+                    document.getElementById("raw_wrapper").innerHTML += '<input id="raw_data" type="file"></input>';
+                    bindChangeEncryptionFile();
+                    //reset the encryption progress bar
+                    document.getElementById("encryption_wrapper").style.display = "none";
+                    document.getElementById("encryption_progress").style.width = "0%";
+                    document.getElementById("encryption_percent").innerHTML = "0%";
+                    document.getElementById("encryption_status").innerHTML = "";
+                    document.getElementById("encryption_status").className = "";
+                }
+
+                //reset and show receive page
+                else if(page === "receive"){
+                    document.getElementById("username").value = myLock.getUsername();
+                    document.getElementById("header").style.display = "inline-block";
+                    document.getElementById("receive").style.display = "inline-block";
+                    window.onbeforeunload = function(){return "Log out?";};
+                    //replace the file input (since it can't be cleared)
+                    delElement(document.getElementById("encrypted_data"));
+                    document.getElementById("encrypted_wrapper").innerHTML += '<input id="encrypted_data" type="file"></input>';
+                    bindChangeDecryptionFile();
+                    //reset the decryption progress bar
+                    document.getElementById("decryption_wrapper").style.display = "none";
+                    document.getElementById("decryption_progress").style.width = "0%";
+                    document.getElementById("decryption_percent").innerHTML = "0%";
+                    document.getElementById("decryption_status").innerHTML = "";
+                    document.getElementById("decryption_status").className = "";
+                }
+            }
+
+            /**********************/
+            /*** Event Handlers ***/
+            /**********************/
+
+            function clickRegister(e){
+                e.preventDefault();
+                //already pending
+                if(document.getElementById("register_msg").innerHTML === "Creating username..."){
+                    return;
+                }
+                //show pending
+                document.getElementById("register_msg").innerHTML = "Creating username...";
+                document.getElementById("register_msg").className = "";
+
+                //registration complete
+                myLock.onUsernameDone = function(error){
+                    //show errors
+                    if(error !== undefined){
+                        document.getElementById("register_msg").innerHTML = error;
+                        document.getElementById("register_msg").className = "error";
+                    }
+                    //redirect to main page
+                    else{
+                        SHOW_ONBOARDING = true;
+                        showPage("main");
+                    }
+                }
+                myLock.setUsername(
+                    undefined,
+                    document.getElementById("new_secret").value);
+            }
+
+            function clickLogin(e){
+                e.preventDefault();
+                //already pending
+                if(document.getElementById("login_msg").innerHTML === "Logging in..."){
+                    return;
+                }
+                //show pending
+                document.getElementById("login_msg").innerHTML = "Logging in...";
+                document.getElementById("login_msg").className = "";
+
+                //login complete
+                myLock.onUsernameDone = function(error){
+                    //show errors
+                    if(error !== undefined){
+                        document.getElementById("login_msg").innerHTML = error;
+                        document.getElementById("login_msg").className = "error";
+                    }
+                    //redirect to main page
+                    else{
+                        SHOW_ONBOARDING = false;
+                        showPage("main");
+                    }
+                }
+                myLock.setUsername(
+                    document.getElementById("existing_username").value,
+                    document.getElementById("existing_secret").value);
+            }
+
+            function clickLogout(e){
+                e.preventDefault();
+                location.reload(); //logout is just a page refresh
+            }
+
+            function clickTutorial(e){
+                e.preventDefault();
+                document.getElementById("tutorial_wrapper").style.display = "none";
+                SHOW_ONBOARDING = false;
+            }
+
+            function clickSendBack(e){
+                e.preventDefault();
+                showPage("main");
+            }
+
+            function clickReceiveBack(e){
+                e.preventDefault();
+                showPage("main");
+            }
+
+            function chooseEncrypt(e){
+                e.preventDefault();
+                showPage("send");
+            }
+
+            function chooseDecrypt(e){
+                e.preventDefault();
+                showPage("receive");
+            }
+
+            function clickAddRecip(e){
+                e.preventDefault();
+                var recip_row = document.createElement('input');
+                recip_row.className = "recip_row";
+                recip_row.placeholder = "Recipient username";
+                document.getElementById("recip_list").insertBefore(
+                    recip_row,
+                    document.getElementById("add_recip"));
+            }
+
+            function changeEncryptionFile(e){
+                var file = document.getElementById("raw_data").files[0];
+                //already pending
+                if(document.getElementById("encryption_status").innerHTML === "Encrypting..."){
+                    return;
+                }
+                //show pending
+                document.getElementById("encryption_wrapper").style.display = "inline-block";
+                document.getElementById("encryption_data").style.display = "none";
+                document.getElementById("encryption_status").innerHTML = "Encrypting...";
+                document.getElementById("encryption_status").className = "";
+
+                //parse recipients
+                var recips = document.querySelectorAll("input.recip_row");
+                var usernames = [myLock.getUsername()];
+                for(var i = 0; i < recips.length; i++){
+                    if(recips[i].value && usernames.indexOf(recips[i].value) === -1){
+                        usernames.push(recips[i].value);
+                    }
+                }
+
+                //encryption progress handling
+                myLock.onEncryptProgress = function(progress){
+                    document.getElementById("encryption_progress").style.width = progress + "%";
+                    document.getElementById("encryption_percent").innerHTML = progress + "%";
+                };
+                //encryption complete handling
+                myLock.onEncryptDone = function(file, error){
+                    if(error !== undefined){
+                        document.getElementById("encryption_status").innerHTML = error;
+                        document.getElementById("encryption_status").className = "error";
+                    }
+                    else{
+                        var data_url = window.URL.createObjectURL(file);
+                        var random_filename = Base58.encode(nacl.randomBytes(8)) + ".locked";
+                        document.getElementById("encryption_data").href = data_url;
+                        document.getElementById("encryption_data").download = random_filename;
+                        document.getElementById("encryption_data").style.display = "inline-block";
+                        document.getElementById("encryption_status").innerHTML = "";
+                        document.getElementById("encryption_status").className = "";
+                    }
+                };
+                myLock.encrypt(file.name, file, usernames);
+            }
+
+            function changeDecryptionFile(e){
+                var file = document.getElementById("encrypted_data").files[0];
+                //already pending
+                if(document.getElementById("decryption_status").innerHTML === "Decrypting..."){
+                    return;
+                }
+                //show pending
+                document.getElementById("decryption_wrapper").style.display = "inline-block";
+                document.getElementById("decryption_data").style.display = "none";
+                document.getElementById("decryption_status").innerHTML = "Decrypting...";
+                document.getElementById("decryption_status").className = "";
+
+                //decryption progress handling
+                myLock.onDecryptProgress = function(progress){
+                    document.getElementById("decryption_progress").style.width = progress + "%";
+                    document.getElementById("decryption_percent").innerHTML = progress + "%";
+                };
+                //decryption complete handling
+                myLock.onDecryptDone = function(sender, filename, file, error){
+                    if(error !== undefined){
+                        document.getElementById("decryption_status").innerHTML = error;
+                        document.getElementById("decryption_status").className = "error";
+                    }
+                    else{
+                        var data_url = window.URL.createObjectURL(file);
+                        document.getElementById("decryption_data").href = data_url;
+                        document.getElementById("decryption_data").download = filename;
+                        document.getElementById("decryption_data").style.display = "inline-block";
+                        document.getElementById("decryption_status").innerHTML = "Signed by: " + sender;
+                        document.getElementById("decryption_status").className = "";
+                    }
+                };
+                myLock.decrypt(file);
+            }
+
+            //bind events
+            document.getElementById("register_button").addEventListener("click", clickRegister);
+            document.getElementById("login_button").addEventListener("click", clickLogin);
+            document.getElementById("logout").addEventListener("click", clickLogout);
+            document.getElementById("send_back").addEventListener("click", clickSendBack);
+            document.getElementById("receive_back").addEventListener("click", clickReceiveBack);
+            document.getElementById("close_tutorial").addEventListener("click", clickTutorial);
+            document.getElementById("choose_send").addEventListener("click", chooseEncrypt);
+            document.getElementById("choose_receive").addEventListener("click", chooseDecrypt);
+            document.getElementById("add_recip").addEventListener("click", clickAddRecip);
+            function bindChangeEncryptionFile(e){
+                document.getElementById("raw_data").removeEventListener("change", changeEncryptionFile);
+                document.getElementById("raw_data").addEventListener("change", changeEncryptionFile);
+            }
+            function bindChangeDecryptionFile(e){
+                document.getElementById("encrypted_data").removeEventListener("change", changeDecryptionFile);
+                document.getElementById("encrypted_data").addEventListener("change", changeDecryptionFile);
+            }
+            bindChangeEncryptionFile();
+            bindChangeDecryptionFile();
+
+        </script>
+    </body>
+</html>
