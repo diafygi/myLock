@@ -13,7 +13,7 @@ encrypt a file that can only be decrypted by the usernames they have selected.
 This project was heavily inspired by [miniLock](https://github.com/kaepora/miniLock),
 who use the same base encryption libraries as myLock. Thanks guys!
 
-#Why use myLock?
+##Why use myLock?
 
 1. The only software requirements for encrypting and decrypting a myLock file is
 a modern web browser. No additional software or plugins are needed. This allows
@@ -41,7 +41,7 @@ want. You can use myLock as disposable encryption by typing gibberish into the
 passphrase for account creation, encrypt the file to the username you intend,
 save the encrypted file, then log out.
 
-#How it works
+##How it works
 
 Public key encryption works by using a public key to encrypt a file, that then
 can only be decrypted by the person who has the complementary secret key. This
@@ -58,7 +58,7 @@ Another really cool feature of myLock is that your username contains your public
 key. That means you can just publish your username wherever you want, and it is
 all people need to encrypt files for you.
 
-#Drawbacks
+##Drawbacks
 
 1. Unfortunately, since only the username and passphrase are used to derive your
 secret key, it means your passphrase has to be strong, so myLock requires a
@@ -79,9 +79,9 @@ salt when you created your account. Without those bytes, the original secret key
 cannot be recreated. Luckily, you don't have worry about keeping your username
 secret so you can keep it somewhere you can easily copy/paste from.
 
-#Technical details
+##Technical details
 
-##External libraries
+###External libraries
 myLock includes three external libraries:
 
 * [TweetNaCl.js](https://github.com/dchest/tweetnacl-js/) - Encryption library
@@ -92,7 +92,7 @@ These libraries are included inline and minified in the myLock `index.html`. The
 exact commit, and steps (if any) to recreate the minified code are commented
 above each library in myLock's code.
 
-##User creation steps
+###User creation steps
 
 1. A user enters a 40+ character secret phrase.
 2. This secret phrase is hashed using [`nacl.hash()`](https://github.com/dchest/tweetnacl-js#naclhashmessage) (uses SHA-512).
@@ -101,7 +101,7 @@ above each library in myLock's code.
 5. A public key is derived form the secret key using [`nacl.box.keyPair.fromSecretKey()`](https://github.com/dchest/tweetnacl-js#naclboxkeypairfromsecretkeysecretkey) (uses curve25519).
 6. A username is created by concating the public key and the salt encoded in base 58 (i.e. `myLock_<publicKey><salt>`).
 
-##User login steps
+###User login steps
 
 1. A user enters their username and secret phrase.
 2. The secret phrase is hashed using [`nacl.hash()`](https://github.com/dchest/tweetnacl-js#naclhashmessage) (uses SHA-512).
@@ -111,7 +111,7 @@ above each library in myLock's code.
 6. A username is created by concating the public key and the salt encoded in base 58 (i.e. `myLock_<publicKey><salt>`).
 7. The recreated username is compared to the user's input to validate a successful login.
 
-##File encryption steps
+###File encryption steps
 
 1. This assumes you have a secret key, your username, and the usernames of recipients.
 2. A 32-byte random file key is generated using [`nacl.randomBytes()`](https://github.com/dchest/tweetnacl-js#naclrandombyteslength) (uses window.crypto.getRandomValues).
@@ -124,7 +124,7 @@ above each library in myLock's code.
 9. These encoded json objects (one per recipient) are prepended to the encrypted file using a period (".") to denote separation between headers (two periods ".." denote the end of all headers and the start of the encrypted file).
 10. The resulting file contains asymmetrically encrypted headers and a symmetrically encrypted file.
 
-##File decryption steps
+###File decryption steps
 
 1. This assumes you have a secret key and an encrypted file.
 2. The file is scanned for headers (split by periods ".").
@@ -139,7 +139,7 @@ above each library in myLock's code.
 11. The file chunks are decrypted with their prepended nonces and the file key using [`nacl.secretbox.open()`](https://github.com/dchest/tweetnacl-js#naclsecretboxopenbox-nonce-key).
 12. The resulting decrypted file is combined with the filename and filetype into a Blob object.
 
-##Encrypted File Structure
+###Encrypted file structure
 
 The following encrypted myLock file has three recipients (i.e. three headers) and two chunks:
 
@@ -170,56 +170,56 @@ Each chunk is prepended with a 24-byte nonce and in it's encrypted form is 16-by
 }
 ```
 
-#myLock core library API
+##myLock core library API
 
-##`myLock.setUsername(username, passphrase)`
+###`myLock.setUsername(username, passphrase)`
 
 Sets a username and secret key in the myLock object. If username is `undefined`,
 a username is generated (can be retrieved via the `myLock.getUsername()`
 function). Passphrases must be at least 40 characters.
 
-##`myLock.onUsernameDone(error)`
+###`myLock.onUsernameDone(error)`
 
 Gets called when a username has been set. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string.
 
-##`myLock.getUsername()`
+###`myLock.getUsername()`
 
 Will return the username set in the myLock object. NOTE: there is not a way
 to retrieve the secret key in the myLock object.
 
-##`myLock.encrypt(filename, file, recipients)`
+###`myLock.encrypt(filename, file, recipients)`
 
 Encrypt a file for a list of recipients (filename is a string, file is a File
 or Blob object, recipients is an array of usernames).
 
-##`myLock.onEncryptProgress(progress)`
+###`myLock.onEncryptProgress(progress)`
 
 Gets called when progress has been made on encryption. The progress value is an
 integer between 0 and 100.
 
-##`myLock.onEncryptDone(file, error)`
+###`myLock.onEncryptDone(file, error)`
 
 Gets called when a file has been encrypted. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string. The file
 is a Blob object.
 
-##`myLock.decrypt(file)`
+###`myLock.decrypt(file)`
 
 Decrypt a file (file is a File or Blob object).
 
-##`myLock.onDecryptProgress(progress)`
+###`myLock.onDecryptProgress(progress)`
 
 Gets called when progress has been made on decryption. The progress value is an
 integer between 0 and 100.
 
-##`myLock.onDecryptDone(sender, filname, file, error)`
+###`myLock.onDecryptDone(sender, filname, file, error)`
 
 Gets called when a file has been decrypted. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string. The
 sender is a string. The filename is a string. The file is a Blob object.
 
-#Example
+##Example
 
 ```javascript
 var myLock = new myLockCore();
@@ -290,11 +290,11 @@ myLock.onUsernameDone = function(error){
 myLock.setUsername(undefined, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 ```
 
-#Demo
+##Demo
 
 https://diafygi.github.io/myLock/
 
-#License and Feedback
+##License and Feedback
 
 This project is released under the MIT license, but external libraries may be
 licensed differently. This project is hosted on [Github](https://www.github.com/diafygi/myLock),
