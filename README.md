@@ -52,7 +52,7 @@ you can decrypt.
 Normally, public key encryption requires that the user keep a secret key saved
 somewhere on your computer. However, myLock uses an algorithm that generates a
 secret key from your username and passphrase, so that you only need the username
-and passphrase to recreate the secret key (see [Drawbacks](#Drawbacks)).
+and passphrase to recreate the secret key (see [Drawbacks](#drawbacks)).
 
 Another really cool feature of myLock is that your username contains your public
 key. That means you can just publish your username wherever you want, and it is
