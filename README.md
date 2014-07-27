@@ -172,48 +172,48 @@ Each chunk is prepended with a 24-byte nonce and in it's encrypted form is 16-by
 
 ##myLock core library API
 
-###`myLock.setUsername(username, passphrase)`
+####`myLock.setUsername(username, passphrase)`
 
 Sets a username and secret key in the myLock object. If username is `undefined`,
 a username is generated (can be retrieved via the `myLock.getUsername()`
 function). Passphrases must be at least 40 characters.
 
-###`myLock.onUsernameDone(error)`
+####`myLock.onUsernameDone(error)`
 
 Gets called when a username has been set. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string.
 
-###`myLock.getUsername()`
+####`myLock.getUsername()`
 
 Will return the username set in the myLock object. NOTE: there is not a way
 to retrieve the secret key in the myLock object.
 
-###`myLock.encrypt(filename, file, recipients)`
+####`myLock.encrypt(filename, file, recipients)`
 
 Encrypt a file for a list of recipients (filename is a string, file is a File
 or Blob object, recipients is an array of usernames).
 
-###`myLock.onEncryptProgress(progress)`
+####`myLock.onEncryptProgress(progress)`
 
 Gets called when progress has been made on encryption. The progress value is an
 integer between 0 and 100.
 
-###`myLock.onEncryptDone(file, error)`
+####`myLock.onEncryptDone(file, error)`
 
 Gets called when a file has been encrypted. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string. The file
 is a Blob object.
 
-###`myLock.decrypt(file)`
+####`myLock.decrypt(file)`
 
 Decrypt a file (file is a File or Blob object).
 
-###`myLock.onDecryptProgress(progress)`
+####`myLock.onDecryptProgress(progress)`
 
 Gets called when progress has been made on decryption. The progress value is an
 integer between 0 and 100.
 
-###`myLock.onDecryptDone(sender, filname, file, error)`
+####`myLock.onDecryptDone(sender, filname, file, error)`
 
 Gets called when a file has been decrypted. A successful completion will leave
 error undefined. An unsuccessful completion will have an error string. The
