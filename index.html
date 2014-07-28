@@ -401,6 +401,7 @@
                     //            "fileInfoEncrypted": {
                     //                "chunkSize": <Integer>,
                     //                "fileName": <String>,
+                    //                "fileSize": <Integer>,
                     //                "fileType": <MIME-type>,
                     //                "fileKey": <Base58>,
                     //                "fileNonce": <Base58>,
@@ -424,6 +425,7 @@
                             nacl.util.decodeUTF8(JSON.stringify({
                                 "chunkSize": chunkSize,
                                 "fileName": filename,
+                                "fileSize": file.size,
                                 "fileType": file.type,
                                 "fileKey": Base58.encode(fileKey),
                                 "fileNonce": Base58.encode(fileNonce),
@@ -564,6 +566,7 @@
                         //    "fileInfo": {
                         //        "chunkSize": <Integer>,
                         //        "fileName": <String>,
+                        //        "fileSize": <Integer>,
                         //        "fileType": <MIME-type>,
                         //        "fileKey": <Base58>,
                         //        "fileNonce": <Base58>,
@@ -645,6 +648,12 @@
                         var chunkSize = userInfo['fileInfo']['chunkSize'];
                         var numChunks = Math.ceil(encryptedArray.byteLength / (chunkSize + 16));
                         var curNonce = userInfo['fileInfo']['fileNonce'];
+
+                        //filesize doesn't match, so bail out
+                        if((data.byteLength - last) - 16 * numChunks !== userInfo['fileInfo']['fileSize']){
+                            ondone(null, null, null, "Couldn't decrypt file");
+                            return;
+                        }
 
                         //define the decrypted array (remove 16 bytes per chunk)
                         var decryptedArray = new Uint8Array(encryptedArray.byteLength - (16) * numChunks);

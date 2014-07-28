@@ -135,7 +135,7 @@ above each library in myLock's code.
 7. If a header's ephemeral information is successfully decrypted, it is decoded to the json object that contains the sender's username and the encrypted file information.
 8. The sender's public key is decoded from the sender's username.
 9. The file information is decrypted with the sender's public key and your secret key using [`nacl.box.open()`](https://github.com/dchest/tweetnacl-js#naclboxopenbox-nonce-theirpublickey-mysecretkey).
-10. The file information contains the chunk size and the file key of the encrypted file itself (as well as the file's filename and filetype).
+10. The file information contains the chunk size, file size, and the file key of the encrypted file itself (as well as the file's filename and filetype).
 11. The file chunks are decrypted with their calculated nonces and the file key using [`nacl.secretbox.open()`](https://github.com/dchest/tweetnacl-js#naclsecretboxopenbox-nonce-key).
 12. The resulting decrypted file is combined with the filename and filetype into a Blob object.
 
@@ -160,6 +160,7 @@ Headers are separated by a period (the headers are encoded in base 58, so period
             "fileInfoEncrypted": {
                 "chunkSize": <Integer>,
                 "fileName": <String>,
+                "fileSize": <String>,
                 "fileType": <MIME-type>,
                 "fileKey": <Base58>,
                 "fileNonce": <Base58>,
