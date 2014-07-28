@@ -388,6 +388,7 @@
                     //generate a file encryption key and set chunks to 200kB
                     var chunkSize = 200000;
                     var fileKey = nacl.randomBytes(32);
+                    var fileNonce = nacl.randomBytes(24);
 
                     //encrypt a userInfo for each recipient in this format:
                     //{
@@ -402,6 +403,7 @@
                     //                "fileName": <String>,
                     //                "fileType": <MIME-type>,
                     //                "fileKey": <Base58>,
+                    //                "fileNonce": <Base58>,
                     //            } (encrypted with recipient.publicKey, fileInfoNonce, and sender.secretKey),
                     //        },
                     //    } (encrypted with recipient.publicKey, userInfoNonce, and ephemeral.secretKey),
@@ -424,6 +426,7 @@
                                 "fileName": filename,
                                 "fileType": file.type,
                                 "fileKey": Base58.encode(fileKey),
+                                "fileNonce": Base58.encode(fileNonce),
                             })),
                             fileInfoNonce,
                             tmpUser.publicKey,
@@ -469,9 +472,10 @@
                         //calculate how many chunks of 10kB
                         var rawArray = new Uint8Array(reader.result);
                         var numChunks = Math.ceil(rawArray.byteLength / chunkSize);
+                        var curNonce = fileNonce;
 
-                        //each chunk has a 24 byte nonce and an additional 16 bytes when encrypted
-                        var encryptedArray = new Uint8Array(rawArray.byteLength + numChunks * (16 + 24));
+                        //each chunk has an additional 16 bytes when encrypted
+                        var encryptedArray = new Uint8Array(rawArray.byteLength + numChunks * (16));
 
                         //use web worker to encrypt
                         var worker_blob = new Blob([
@@ -482,15 +486,14 @@
                         function encryptChunk(i){
                             //calculate raw chunk
                             var chunk = rawArray.subarray(i * chunkSize, (i + 1) * chunkSize);
-                            var nonce = nacl.randomBytes(24);
+                            curNonce = nacl.hash(curNonce).subarray(0, 24);
 
                             //listen for chunk encryption completion
                             worker.onmessage = function(message){
 
                                 //populate that chunk of the encrypted array
-                                var offset = i * (chunkSize + 16 + 24);
-                                encryptedArray.set(nonce, offset);
-                                encryptedArray.set(message.data, offset + 24);
+                                var offset = i * (chunkSize + 16);
+                                encryptedArray.set(message.data, offset);
 
                                 //see if you need to process another chunk
                                 if(i < numChunks - 1){
@@ -511,7 +514,7 @@
                             };
                             worker.postMessage({
                                 "raw": chunk,
-                                "nonce": nonce,
+                                "nonce": curNonce,
                                 "key": fileKey,
                             });
                         }
@@ -563,6 +566,7 @@
                         //        "fileName": <String>,
                         //        "fileType": <MIME-type>,
                         //        "fileKey": <Base58>,
+                        //        "fileNonce": <Base58>,
                         //    },
                         //}
                         var userInfo;
@@ -617,6 +621,7 @@
                                 //set filename in the userInfo object
                                 tmpInfo['fileInfo'] = JSON.parse(nacl.util.encodeUTF8(tmpFileInfo));
                                 tmpInfo['fileInfo']['fileKey'] = Base58.decode(tmpInfo['fileInfo']['fileKey']);
+                                tmpInfo['fileInfo']['fileNonce'] = Base58.decode(tmpInfo['fileInfo']['fileNonce'])
                             }
                             catch(e){
                                 console.log(e);
@@ -638,10 +643,11 @@
                         //calculate how many chunks
                         var encryptedArray = data.subarray(last, data.byteLength);
                         var chunkSize = userInfo['fileInfo']['chunkSize'];
-                        var numChunks = Math.ceil(encryptedArray.byteLength / (chunkSize + 16 + 24));
+                        var numChunks = Math.ceil(encryptedArray.byteLength / (chunkSize + 16));
+                        var curNonce = userInfo['fileInfo']['fileNonce'];
 
                         //define the decrypted array (remove 16 bytes per chunk)
-                        var decryptedArray = new Uint8Array(encryptedArray.byteLength - (16 + 24) * numChunks);
+                        var decryptedArray = new Uint8Array(encryptedArray.byteLength - (16) * numChunks);
 
                         //use web worker to decrypt
                         var worker_blob = new Blob([
@@ -651,14 +657,12 @@
 
                         function decryptChunk(i){
                             //calculate raw nonce subsection
-                            var nonce = encryptedArray.subarray(
-                                i * (chunkSize + 16 + 24),
-                                i * (chunkSize + 16 + 24) + 24);
+                            curNonce = nacl.hash(curNonce).subarray(0, 24);
 
                             //calculate raw chunk subsection
                             var chunk = encryptedArray.subarray(
-                                i * (chunkSize + 16 + 24) + 24,
-                                (i + 1) * (chunkSize + 16 + 24));
+                                i * (chunkSize + 16),
+                                (i + 1) * (chunkSize + 16));
 
                             //listen for decryption completion
                             worker.onmessage = function(message){
@@ -692,7 +696,7 @@
                             };
                             worker.postMessage({
                                 "encrypted": chunk,
-                                "nonce": nonce,
+                                "nonce": curNonce,
                                 "key": userInfo['fileInfo']['fileKey'],
                             });
                         }
